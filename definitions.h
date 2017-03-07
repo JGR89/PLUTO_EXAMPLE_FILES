@@ -7,7 +7,7 @@
 #define  RECONSTRUCTION          LINEAR
 #define  TIME_STEPPING           RK2
 #define  DIMENSIONAL_SPLITTING   NO
-#define  NTRACER                 41
+#define  NTRACER                 1
 #define  USER_DEF_PARAMETERS     4
 
 /* -- physics dependent declarations -- */
