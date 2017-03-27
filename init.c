@@ -1,33 +1,18 @@
 #include "pluto.h"
 
-#define min_tracer_time  0.0 // time of first tracer injection
-#define max_tracer_time  4.0 // time of final tracer injection
-#define inject_frac  0.05 // fraction of time tracer is
 
 /* ********************************************************************* */
 void Init (double *v, double x1, double x2, double x3)
 {
-    int t;
-    double r, cs, Temp;
+    double r, cs;
     r = x1;
     
-   // v[RHO] = pow((1+(x1/g_inputParam[R_CORE])*(x1/g_inputParam[R_CORE])),-1.5*g_inputParam[B_EXPONENT]); /* King profile of Krause 2005 */
     cs = 1;
     v[RHO] = pow(1 + pow(r/g_inputParam[R_CORE],2),-1.5*g_inputParam[B_EXPONENT]);
     g_gamma = 5.0/3.0;
     v[VX1] = 0.0;
     v[VX2] = 0.0;
     v[PRS]  = (cs/g_gamma)*v[RHO];
-    if (NTRACER > 0)
-    {
-        v[TRC + 0] = 0.0;   /* jet tracer */
-        
-        for (t = 1; t < NTRACER; t++) //so start at t, and incriment t until t = NTRACER
-        {
-            //printf("tracer1 %d\n", t);
-            v[TRC + t] = 0.0;   /* tracer i */
-        }
-    }
 }
 /* **************************************************************** */
 
@@ -57,9 +42,7 @@ void UserDefBoundary (const Data *d, RBox *box, int side, Grid *grid)
     r = grid[IDIR].xgc;  /* -- array pointer to x1 coordinate -- */
     theta = grid[JDIR].xgc;  /* -- array pointer to x2 coordinate -- */
     /* x3 = grid[KDIR].xgc;   -- array pointer to x3 coordinate -- */
-    //printf("L1b is %e\n theta_rad is %e\n Omega is %e\n input angle is %e\n ",L1b, theta_rad, Omega, g_inputParam[H_OPEN_ANG]);
     vj[RHO] = pow(L1b,2);
-    //printf("Calculated rhojet is %e. I input %e\n",pow(L1b,2),vj[RHO]);
     vj[PRS] = 1.0/g_gamma;         /* -- Pressure-matched jet -- */
     vj[VX1] = g_inputParam[MACH_EXT];  /* -- Sound speed is one in this case -- */
     
@@ -107,10 +90,6 @@ void UserDefBoundary (const Data *d, RBox *box, int side, Grid *grid)
                 d->Vc[VX1][k][j][i] =  d->Vc[VX1][k][j][2*IBEG - i - 1];
                 d->Vc[VX2][k][j][i] = -d->Vc[VX2][k][j][2*IBEG - i - 1];
                 d->Vc[PRS][k][j][i] =  d->Vc[PRS][k][j][2*IBEG - i - 1];
-                if (NTRACER > 0)
-                {
-                    d->Vc[TRC][k][j][i] =  d->Vc[TRC][k][j][2*IBEG - i - 1]; /* tracer particle over jet */
-                }
             }
 
         }
@@ -140,9 +119,6 @@ double BodyForcePotential(double x1, double x2, double x3)
  *********************************************************************** */
 
 {
-   // double Phi_0;
-   // Phi_0 = -1.5*g_inputParam[B_EXPONENT]/g_gamma;
-   // return Phi_0*log(1+(x1/g_inputParam[R_CORE])*(x1/g_inputParam[R_CORE]));
     double rho, g_gamma, r;
     g_gamma = 5.0/3.0;
     r = x1;
